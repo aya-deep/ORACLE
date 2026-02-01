@@ -180,7 +180,7 @@ env_var () {
 	export ORACLE_SID=ORCL                 
 	export PATH=$ORACLE_HOME/bin:$PATH      
 	export LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
-	" > /home/oracle/.bashrc
+	" >> /home/oracle/.bashrc
 }
 
 # Function for editing the SELINUX for oracle database
