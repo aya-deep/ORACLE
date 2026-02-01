@@ -197,6 +197,7 @@ install_zip () {
 		return 1
 	fi
 	unzip "$zip_path" -d /u01/app/oracle/product/19.0.0/dbhome_1
+	chown -R oracle:orainstall /u01
 }
 
 # Main function to execute everything
