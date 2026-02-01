@@ -175,12 +175,13 @@ EOF
 
 # Function to export the env var for oracle database
 env_var () {
-	echo "export ORACLE_BASE=/u01/app/oracle     
-	export ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1 
-	export ORACLE_SID=ORCL                 
-	export PATH=$ORACLE_HOME/bin:$PATH      
-	export LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
-	" >> /home/oracle/.bashrc
+	cat << EOF > /home/oracle/.bashrc
+export ORACLE_BASE=/u01/app/oracle     
+export ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1 
+export ORACLE_SID=ORCL                 
+export PATH=$ORACLE_HOME/bin:$PATH      
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
+EOF
 }
 
 # Function for editing the SELINUX for oracle database
