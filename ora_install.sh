@@ -6,7 +6,7 @@
 # Author        : Allali Ayoub
 # Created       : 2026-01-28
 # Version       : 1.0
-# Usage         : sudo ./install_oracle.sh
+# Usage         : sudo ./install_oracle.sh path_oracle_zip
 ###############################################################################
 
 # Check if the user is root
@@ -15,7 +15,29 @@ if [[ $UID -ne 0 ]]; then
 	exit 1
 fi
 
-# Function fot the creation of the necessary groups
+usage() {
+    echo "Usage: $0 <fichier.zip>"
+    echo ""
+    echo "Description:"
+    echo "  This script take a ZIP file."
+    echo ""
+    echo "Arguments:"
+    echo "  <fichier.zip>    Path to the ZIP file to be processed"
+    echo ""
+    echo "Exemple:"
+    echo "  $0 archive.zip"
+    echo "  $0 /path/to/oracle.zip"
+}
+
+# The script must take the zip file
+if [[ $# -ne 1 ]]; then
+	usage
+	exit 1
+else
+	zip_path="$1"
+fi
+
+# Function for the creation of the necessary groups
 func_groups () {
 groups=(oinstall dba oper backupdba dgdba kmdba asmdba asmoper asmadmin racdba)
 gid_value=54321
@@ -33,10 +55,9 @@ for group in "${groups[@]}"; do
 	fi
 	((gid_value++))
 done
-
 }
 
-# Function fot the creation of the necessary users
+# Function for the creation of the necessary users
 func_users() {
 	useradd -u 54321 -m -g oinstall -G dba,oper oracle 2>/dev/null
 	if [[ $? -eq 0 ]]; then
@@ -101,7 +122,6 @@ install_packages () {
 			echo "Package $package installed"
 		fi
 	done
-
 }
 
 # Function for the creation of the necessary directory for oracle database
@@ -118,7 +138,7 @@ directory_creation() {
 
 # Function for updating the kernel options for oracle database
 kernel_settings() {
-    cat <<EOF > /etc/sysctl.d/200-oracle.conf
+    cat <<EOF > /etc/sysctl.d/99-oracle.conf
 fs.file-max = 6815744
 kernel.sem = 250 32000 100 128
 kernel.shmmni = 4096
@@ -171,7 +191,6 @@ se_linux () {
 
 # Function to recup the zip file for the installation of oracle database
 install_zip () {
-	zip_path="$1"
 	if [ ! -f $zip_path ]; then
 		echo "error: zip file doesn't exist"
 		return 1
@@ -186,46 +205,46 @@ main() {
     echo "========================================="
     echo ""
     
-    echo "=== Création des groupes ==="
+    echo "=== Creation of the groups ==="
     func_groups
     echo ""
     
-    echo "=== Création de l'utilisateur oracle ==="
+    echo "=== Creation of oracle user ==="
     func_users
     echo ""
     
-    echo "=== Installation des packages ==="
+    echo "=== Installation of packages ==="
     install_packages
     echo ""
     
-    echo "=== Création des répertoires ==="
+    echo "=== Creation of repertories ==="
     directory_creation
     echo ""
     
-    echo "=== Configuration kernel ==="
+    echo "=== Configuration of kernel ==="
     kernel_settings
     echo ""
     
-    echo "=== Configuration limites système ==="
+    echo "=== Configuration of the Os limits ==="
     limits_setting
     echo ""
     
-    echo "=== Configuration variables d'environnement ==="
+    echo "=== Configuration of the environnement variables ==="
     env_var
     echo ""
     
-    echo "=== Désactivation SELinux ==="
+    echo "=== Desactivation of SELinux ==="
     se_linux
     echo ""
     
+    echo "=== Unzip the oracle zip in ORACLE_HOME ==="
+    install_zip
+
     echo "========================================="
-    echo "✅ Préparation système terminée !"
+    echo "✅ The OS preparation is complete !"
     echo "========================================="
-    echo ""
-    echo "Pour installer Oracle :"
-    echo "1. Lance : sudo ./install_oracle.sh /chemin/vers/oracle.zip"
-    echo "2. Puis : su - oracle"
-    echo "3. Puis : cd \$ORACLE_HOME && ./runInstaller"
+    echo "To launch the installation:"
+    echo "cd \$ORACLE_HOME && ./runInstaller"
 }
 
 main
